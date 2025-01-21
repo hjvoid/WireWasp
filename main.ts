@@ -4,11 +4,13 @@ import { crawlUrl } from './tools/crawler.ts';
 const args = parseArgs(Deno.args, {
   alias: {
     startUrl: "u",
+    followRedirects: "r",
     help: "h"
   }
 })
 
 const startUrl = args.startUrl as keyof typeof String
+const followRedirects = args.followRedirects as keyof typeof String
 
 async function main() {
   if(args.help){
@@ -26,7 +28,9 @@ async function main() {
     )
     Deno.exit(1)
   }
-  const results = await crawlUrl(startUrl, true); // Use Puppeteer for JavaScript-rendered content
+
+  const redirect = followRedirects ? true : false
+  const results = await crawlUrl(startUrl, true, redirect); 
 
   results.forEach(result => {
     console.log(`URL: ${result.url}`);

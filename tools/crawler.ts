@@ -27,7 +27,8 @@ interface CrawlResult {
    */
   export async function crawlUrl(
     startUrl: string,
-    useHeadless: boolean = false
+    useHeadless: boolean = false,
+    ignoreRedirects: boolean = true 
   ): Promise<CrawlResult[]> {
     const results: CrawlResult[] = [];
   
@@ -38,12 +39,17 @@ interface CrawlResult {
       console.log(`Crawling: ${url}`);
       try {
         let html: string;
+  
         if (useHeadless) {
           html = await fetchHtmlWithPuppeteer(url);
         } else {
-          const response = await fetch(url);
+          const response = await fetch(url); // Manual mode for detecting redirects
           if (!response.ok) {
-            console.error(`%c Failed to fetch ${url}: ${response.status}`, "color: red");
+            if (ignoreRedirects && response.status >= 300 && response.status < 400) {
+              console.warn(`Skipping redirect: ${url}`);
+              return; // Skip this URL if it's a redirect and ignoreRedirects is true
+            }
+            console.error(`Failed to fetch ${url}: ${response.status}`);
             return;
           }
           html = await response.text();
@@ -62,17 +68,18 @@ interface CrawlResult {
         }
       } catch (error) {
         if (error instanceof Error) {
-          console.error(
-            `%c Error crawling ${url}: ${error.message}`, "color: red");
+          console.error(`Error crawling ${url}: ${error.message}`);
+          Deno.exit(1)
         } else {
-          console.error(`%c Unknown error crawling ${url}`, "color: red");
+          console.error(`Unknown error crawling ${url}`);
+          Deno.exit(1)
         }
       }
     }
   
     await crawl(startUrl);
     return results;
-  }
+  }  
   
   /**
    * Fetch HTML using Puppeteer for JavaScript-rendered pages.
@@ -129,7 +136,9 @@ interface CrawlResult {
       if (href && !href.startsWith('http')) {
         href = new URL(href, baseUrl).href; // Convert relative URL to absolute
       }
-      if (href && href.startsWith(baseUrl)) {
+  
+      // Exclude redirect links
+      if (href && href.startsWith(baseUrl) && !href.includes('/redirect?')) {
         links.push(href);
       }
     });

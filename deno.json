@@ -1,0 +1,10 @@
+{
+  "tasks": {
+    "wirewasp": "deno run -A main.ts"
+  },
+  "imports": {
+    "@oak/oak": "jsr:@oak/oak@^17.1.4",
+    "@std/assert": "jsr:@std/assert@1",
+    "@std/cli": "jsr:@std/cli@1.0.10"
+  }
+}

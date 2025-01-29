@@ -1,6 +1,6 @@
 import { cheerio } from "https://deno.land/x/cheerio@1.0.7/mod.ts";
 import puppeteer from "npm:puppeteer@24.1.0"
-import {scanURL} from "../scanners/sqli-scanner.ts"
+import { scanForSQLi } from "./scanForSQLi.ts"
 
 interface CrawlResult {
     url: string;
@@ -58,25 +58,20 @@ interface CrawlResult {
   
         const $ = cheerio.load(html);
   
-        // Discover forms
-        const forms = discoverForms($, url);
-        results.push({ url, forms });
-  
         // Queue internal links for crawling
         const links = discoverLinks($, url);
         for (const link of links) {
           await crawl(link);
         }
         
-        const sqliScanner = scanURL(url)
-        
+        scanForSQLi(url).catch((error) => console.error(`%c Scan failed: ${error}`, "color: red"))
 
       } catch (error) {
         if (error instanceof Error) {
-          console.error(`Error crawling ${url}: ${error.message}`);
+          console.error(`%c Error crawling ${url}: ${error}`, "color: red");
           Deno.exit(1)
         } else {
-          console.error(`Unknown error crawling ${url}`);
+          console.error(`%c Unknown error crawling ${url}`, "color: red");
           Deno.exit(1)
         }
       }
@@ -98,33 +93,6 @@ interface CrawlResult {
     const content = await page.content();
     await browser.close();
     return content;
-  }
-  
-  /**
-   * Discover forms on a page.
-   * @param {cheerio.Root} $ - The Cheerio instance.
-   * @param {string} baseUrl - The base URL of the page.
-   * @returns {FormInfo[]} - A list of forms found on the page.
-   */
-  function discoverForms($: cheerio.Root, baseUrl: string): FormInfo[] {
-    const forms: FormInfo[] = [];
-  
-    $('form').each((index: number, form: cheerio.Element) => {
-      const action = $(form).attr('action') || baseUrl;
-      const method = $(form).attr('method') || 'GET';
-      const inputs: InputInfo[] = [];
-  
-      $(form).find('input').each((inputIndex: number, input: cheerio.Element) => {
-        inputs.push({
-          name: $(input).attr('name') || '',
-          type: $(input).attr('type') || 'text',
-        });
-      });
-  
-      forms.push({ action, method, inputs });
-    });
-  
-    return forms;
   }
   
   /**
@@ -150,20 +118,3 @@ interface CrawlResult {
   
     return Array.from(new Set(links)); // Deduplicate links
   }
-
-
-    /**
-   * Discover internal links on a page.
-   * @param {string} baseUrl - The base URL of the page.
-   * @returns {string[]} - A list of params.
-   */
-  function extractParams(url: string): string[] {
-    try {
-        const parsedUrl = new URL(url)
-        return [...parsedUrl.searchParams.keys()]
-    } catch (error) {
-        console.error(`Invalid URL:`, error)
-        return []
-    }
-}
-  

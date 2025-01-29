@@ -21,7 +21,6 @@ async function main() {
       `)
     Deno.exit(0)
   }
-  console.log(typeof startUrl);
   
   if (!startUrl || typeof startUrl !== "string") {
     console.error(

@@ -21,7 +21,9 @@ async function main() {
       `)
     Deno.exit(0)
   }
-  if(!startUrl){
+  console.log(typeof startUrl);
+  
+  if (!startUrl || typeof startUrl !== "string") {
     console.error(
       `%c You must provide a valid URL (example: http://probedbyaliens.com)`, 
       "color: red"

@@ -1,5 +1,6 @@
 import { cheerio } from "https://deno.land/x/cheerio@1.0.7/mod.ts";
 import puppeteer from "npm:puppeteer@24.1.0"
+import {scanURL} from "../scanners/sqli-scanner.ts"
 
 interface CrawlResult {
     url: string;
@@ -35,7 +36,7 @@ interface CrawlResult {
     async function crawl(url: string) {
       if (visited.has(url)) return;
       visited.add(url);
-  
+      
       console.log(`Crawling: ${url}`);
       try {
         let html: string;
@@ -66,6 +67,10 @@ interface CrawlResult {
         for (const link of links) {
           await crawl(link);
         }
+        
+        const sqliScanner = scanURL(url)
+        
+
       } catch (error) {
         if (error instanceof Error) {
           console.error(`Error crawling ${url}: ${error.message}`);
@@ -145,4 +150,20 @@ interface CrawlResult {
   
     return Array.from(new Set(links)); // Deduplicate links
   }
+
+
+    /**
+   * Discover internal links on a page.
+   * @param {string} baseUrl - The base URL of the page.
+   * @returns {string[]} - A list of params.
+   */
+  function extractParams(url: string): string[] {
+    try {
+        const parsedUrl = new URL(url)
+        return [...parsedUrl.searchParams.keys()]
+    } catch (error) {
+        console.error(`Invalid URL:`, error)
+        return []
+    }
+}
   

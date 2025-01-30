@@ -1,5 +1,5 @@
 import { sendRequest } from "../utils/sendRequest.ts"
-import { TextLineStream } from 'https://deno.land/std/streams/mod.ts'
+import { TextLineStream } from "https://deno.land/std@0.224.0/streams/mod.ts"
 import { extractForms } from "../utils/formExtractor.ts"
 
 

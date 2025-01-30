@@ -1,5 +1,3 @@
-import axios from 'npm:axios@1.7.9'
-import { cheerio } from "https://deno.land/x/cheerio@1.0.7/mod.ts";
 import puppeteer from "npm:puppeteer@24.1.0"
 
 

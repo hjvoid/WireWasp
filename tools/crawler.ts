@@ -1,24 +1,24 @@
-import { cheerio } from "https://deno.land/x/cheerio@1.0.7/mod.ts";
+import { cheerio } from "https://deno.land/x/cheerio@1.0.7/mod.ts"
 import puppeteer from "npm:puppeteer@24.1.0"
 import { scanForSQLi } from "./scanForSQLi.ts"
 
 interface CrawlResult {
-    url: string;
-    forms: FormInfo[];
+    url: string
+    forms: FormInfo[]
   }
   
   interface FormInfo {
-    action: string;
-    method: string;
-    inputs: InputInfo[];
+    action: string
+    method: string
+    inputs: InputInfo[]
   }
   
   interface InputInfo {
-    name: string;
-    type: string;
+    name: string
+    type: string
   }
   
-  const visited = new Set<string>();
+  const visited = new Set<string>()
   
   /**
    * Crawl a URL to find links and forms.
@@ -31,54 +31,53 @@ interface CrawlResult {
     useHeadless: boolean = false,
     ignoreRedirects: boolean = true 
   ): Promise<CrawlResult[]> {
-    const results: CrawlResult[] = [];
+    const results: CrawlResult[] = []
   
     async function crawl(url: string) {
-      if (visited.has(url)) return;
-      visited.add(url);
+      if (visited.has(url)) return
+      visited.add(url)
       
-      console.log(`Crawling: ${url}`);
+      console.log(`Crawling: ${url}`)
       try {
-        let html: string;
+        let html: string
   
         if (useHeadless) {
-          html = await fetchHtmlWithPuppeteer(url);
+          html = await fetchHtmlWithPuppeteer(url)
         } else {
-          const response = await fetch(url); // Manual mode for detecting redirects
+          const response = await fetch(url) 
           if (!response.ok) {
             if (ignoreRedirects && response.status >= 300 && response.status < 400) {
-              console.warn(`Skipping redirect: ${url}`);
-              return; // Skip this URL if it's a redirect and ignoreRedirects is true
+              console.warn(`Skipping redirect: ${url}`)
+              return
             }
-            console.error(`Failed to fetch ${url}: ${response.status}`);
-            return;
+            console.error(`Failed to fetch ${url}: ${response.status}`)
+            return
           }
-          html = await response.text();
+          html = await response.text()
         }
   
-        const $ = cheerio.load(html);
+        const $ = cheerio.load(html)
   
-        // Queue internal links for crawling
-        const links = discoverLinks($, url);
+        const links = discoverLinks($, url)
         for (const link of links) {
-          await crawl(link);
+          await crawl(link)
         }
         
         scanForSQLi(url).catch((error) => console.error(`%c Scan failed: ${error}`, "color: red"))
 
       } catch (error) {
         if (error instanceof Error) {
-          console.error(`%c Error crawling ${url}: ${error}`, "color: red");
+          console.error(`%c Error crawling ${url}: ${error}`, "color: red")
           Deno.exit(1)
         } else {
-          console.error(`%c Unknown error crawling ${url}`, "color: red");
+          console.error(`%c Unknown error crawling ${url}`, "color: red")
           Deno.exit(1)
         }
       }
     }
   
-    await crawl(startUrl);
-    return results;
+    await crawl(startUrl)
+    return results
   }  
   
   /**
@@ -87,12 +86,12 @@ interface CrawlResult {
    * @returns {Promise<string>} - The HTML content.
    */
   async function fetchHtmlWithPuppeteer(url: string): Promise<string> {
-    const browser = await puppeteer.launch();
-    const page = await browser.newPage();
-    await page.goto(url, { waitUntil: "networkidle2" });
-    const content = await page.content();
-    await browser.close();
-    return content;
+    const browser = await puppeteer.launch()
+    const page = await browser.newPage()
+    await page.goto(url, { waitUntil: "networkidle2" })
+    const content = await page.content()
+    await browser.close()
+    return content
   }
   
   /**
@@ -102,19 +101,19 @@ interface CrawlResult {
    * @returns {string[]} - A list of internal links.
    */
   function discoverLinks($: cheerio.Root, baseUrl: string): string[] {
-    const links: string[] = [];
+    const links: string[] = []
   
     $('a[href]').each((index: number, anchor: cheerio.Element) => {
-      let href = $(anchor).attr('href');
+      let href = $(anchor).attr('href')
       if (href && !href.startsWith('http')) {
-        href = new URL(href, baseUrl).href; // Convert relative URL to absolute
+        href = new URL(href, baseUrl).href
       }
   
       // Exclude redirect links
       if (href && href.startsWith(baseUrl) && !href.includes('/redirect?')) {
-        links.push(href);
+        links.push(href)
       }
-    });
+    })
   
-    return Array.from(new Set(links)); // Deduplicate links
+    return Array.from(new Set(links))
   }

@@ -1,5 +1,5 @@
-import { parseArgs } from "jsr:@std/cli/parse-args";
-import { crawlUrl } from './tools/crawler.ts';
+import { parseArgs } from "jsr:@std/cli/parse-args"
+import { crawlUrl } from './tools/crawler.ts'
 
 const args = parseArgs(Deno.args, {
   alias: {
@@ -31,20 +31,20 @@ async function main() {
   }
 
   const redirect = followRedirects ? true : false
-  const results = await crawlUrl(startUrl, true, redirect); 
+  const results = await crawlUrl(startUrl, true, redirect) 
 
   results.forEach(result => {
-    console.log(`URL: ${result.url}`);
+    console.log(`URL: ${result.url}`)
     result.forms.forEach((form, index) => {
-      console.log(`  Form #${index + 1}:`);
-      console.log(`    Action: ${form.action}`);
-      console.log(`    Method: ${form.method}`);
-      console.log(`    Inputs:`);
+      console.log(`  Form #${index + 1}:`)
+      console.log(`    Action: ${form.action}`)
+      console.log(`    Method: ${form.method}`)
+      console.log(`    Inputs:`)
       form.inputs.forEach(input => {
-        console.log(`      - Name: ${input.name}, Type: ${input.type}`);
-      });
-    });
-  });
+        console.log(`      - Name: ${input.name}, Type: ${input.type}`)
+      })
+    })
+  })
 }
 
-main();
+main()

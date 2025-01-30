@@ -20,11 +20,11 @@ export async function sendRequest(
         params: method === 'GET' ? params : {}, 
         data: method === 'POST' ? data : {}, 
         headers: { 'Content-Type': 'application/json' }, // Add cookie / relevant headers?
-      });
+      })
   
-      return response;
+      return response
     } catch (error) {
-      console.error(`Request failed: ${error}`);
-      throw error;
+      console.error(`Request failed: ${error}`)
+      throw error
     }
   }

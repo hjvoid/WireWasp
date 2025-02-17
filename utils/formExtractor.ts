@@ -10,7 +10,7 @@ export async function extractForms(url: string) {
     const browser = await puppeteer.launch({ headless: true });
     const page = await browser.newPage();
   
-    console.log(`📡 Navigating to ${url}...`);
+    console.log(`📡 Extracting forms and inputs at ${url}...`);
     await page.goto(url, { waitUntil: 'networkidle2' });
   
     const inputs = await page.$$eval('input, textarea, select', (elements) =>
@@ -31,11 +31,11 @@ export async function extractForms(url: string) {
   
     await browser.close();
   
+    // Make sure elements not enclosed within a <form> element are not ignored.
     if (forms.length === 0 && inputs.length > 0) {
-      console.log('⚠️ No <form> elements detected. Generating pseudo-form from inputs...');
       return [{ action: url, method: 'POST', inputs: inputs.map((input) => input.name) }];
     }
-  
+    
     return forms.map((form) => ({
       ...form,
       inputs: inputs.map((input) => input.name),

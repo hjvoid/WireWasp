@@ -14,7 +14,6 @@ You can then test the tool against it using the CLI command:\
 
 TODO:
 1. Get optional redirects working.
-2. Add payloads folder.
-3. Add intial tests
-3. Add scanner class.
+2. Implemet HeadFUL mode.
+3. Add intial tests.
 4. Change Cheerio import in crawler to package.json.

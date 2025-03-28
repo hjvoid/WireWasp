@@ -6,11 +6,13 @@ import puppeteer from "npm:puppeteer@24.1.0"
  * @param url - The target webpage URL.
  * @returns An array of extracted forms.
  */
-export async function extractForms(url: string) {
+export async function extractForms(url: string, verbose: boolean) {
     const browser = await puppeteer.launch({ headless: true });
     const page = await browser.newPage();
   
-    console.log(`📡 Extracting forms and inputs at ${url}...`);
+    if (verbose) {
+      console.log(`%c 📡 Extracting forms and inputs at ${url}...`, "color: turquoise");
+    }
     await page.goto(url, { waitUntil: 'networkidle2' });
   
     const inputs = await page.$$eval('input, textarea, select', (elements) =>

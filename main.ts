@@ -1,11 +1,15 @@
 import { parseArgs } from "jsr:@std/cli/parse-args"
 import { crawlUrl } from './tools/crawler.ts'
+import * as fs from 'node:fs';
+// import templates from "./templates";
 
 const args = parseArgs(Deno.args, {
   alias: {
     startUrl: "u",
     followRedirects: "r",
     sqliScan: "s",
+    outputToFile: "o",
+    verbose: "v",
     help: "h"
   }
 })
@@ -20,6 +24,10 @@ async function main() {
       usage: deno run dev -u <baseUrl>
       -h, --help  Show help
       -u, --url   Url e.g. http://example.com 
+      -r, --redirects  Follow redirects (default: false)
+      -s, --sqli  Scan for SQL injection vulnerabilities (default: false)
+      -o, --output  Output to file (default: false)
+      -v, --verbose  Verbose output (default: false)
       `)
     Deno.exit(0)
   }
@@ -34,21 +42,40 @@ async function main() {
 
   const redirect = followRedirects ? false : true
   const sqliInit = sqliScan ? true : false
-  
-  const results = await crawlUrl(startUrl, true, redirect, sqliInit) 
+  const outputToFile = args.outputToFile ? true : false
+  const verbose = args.verbose ? true : false
+  // let results: Array<T> = []
+
+  const results = await crawlUrl(startUrl, true, redirect, sqliInit, verbose) 
 
   if(results) {
-    console.log(`\nURLS Found:`)
+    if (verbose){
+      console.log(`\nURLS Found:`)
+    }
     results.forEach(result => {
-      console.log(`%c   URL: ${result.url}`, "color: yellow")
+      if (verbose) {
+        console.log(`%c   URL: ${result.url}`, "color: yellow")
+      }
       if(result.formsFound){
-        console.log(`%c     ✅ Found ${result.formsFound.toString()} form(s) on ${result.url}:`, "color: green")
+        if (verbose) {
+          console.log(`%c     ✅ Found ${result.formsFound.toString()} form(s) on ${result.url}:`, "color: green")
+        }
       }else {
-        console.log(`%c     ❌ No forms found on ${result.url}`, "color: red")
+        if (verbose) {
+          console.log(`%c     ❌ No forms found on ${result.url}`, "color: red")
+        }
       }
     })
+    if(outputToFile){
+      Deno.writeFileSync("./results.json", new TextEncoder().encode(JSON.stringify(results, null, 2)), { append: false })
+      console.log(`%c   Results saved to results.json`, "color: green");
+    }
+  } else {
+    console.log(`%c No URLs found`, "color: red")
   }
 
+  console.log("\n");
+  console.log(`%c Done!`, "color: orange")
   console.log("\n");
   
 }

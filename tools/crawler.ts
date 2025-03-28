@@ -27,7 +27,8 @@ interface CrawlResult {
     startUrl: string,
     useHeadless: boolean = false,
     ignoreRedirects: boolean = true ,
-    sqliInit: boolean = false
+    sqliInit: boolean = false,
+    verbose: boolean = false
   ): Promise<CrawlResult[]> {
     const results: CrawlResult[] = []
 
@@ -35,8 +36,9 @@ interface CrawlResult {
       if (visited.has(url)) return
       visited.add(url)
       results.push({url})
-
-      console.log(`Crawling: ${url}`)
+      if (verbose) {
+        console.log(`%c 🕸️ Crawling: ${url}`, "color: blue")
+      }
       try {
         let html: string
   
@@ -80,8 +82,8 @@ interface CrawlResult {
       const scanResults = await Promise.all(
         results.map(async (result) => {
           try {
-            const sqliResult = await scanForSQLi(result.url);
-            const forms = await extractForms(result.url);
+            const sqliResult = await scanForSQLi(result.url, verbose);
+            const forms = await extractForms(result.url, verbose);
             if (forms.length) {
               results[results.indexOf(result)].formsFound = forms.length
             } 

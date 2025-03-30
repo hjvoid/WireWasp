@@ -10,6 +10,7 @@ const args = parseArgs(Deno.args, {
     sqliScan: "s",
     outputToFile: "o",
     verbose: "v",
+    findForms: "f",
     help: "h"
   }
 })
@@ -28,6 +29,7 @@ async function main() {
       -s, --sqli  Scan for SQL injection vulnerabilities (default: false)
       -o, --output  Output to file (default: false)
       -v, --verbose  Verbose output (default: false)
+      -f, --findForms  Find forms on the page (default: false)
       `)
     Deno.exit(0)
   }
@@ -44,13 +46,14 @@ async function main() {
   const sqliInit = sqliScan ? true : false
   const outputToFile = args.outputToFile ? true : false
   const verbose = args.verbose ? true : false
-  // let results: Array<T> = []
+  const findForms = args.findForms ? true : false
+  
 
-  const results = await crawlUrl(startUrl, true, redirect, sqliInit, verbose) 
+  const results = await crawlUrl(startUrl, true, redirect, sqliInit, findForms, verbose) 
 
-  if(results) {
+  if(results && findForms) {
     if (verbose){
-      console.log(`\nURLS Found:`)
+      console.log(`\nForms Found:`)
     }
     results.forEach(result => {
       if (verbose) {

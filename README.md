@@ -13,7 +13,12 @@ You can then test the tool against it using the CLI command:\
 `deno run wirewasp -u http://localhost:3000`
 
 TODO:
-1. Get optional redirects working.
-2. Implemet HeadFUL mode.
-3. Add intial tests.
-4. Change Cheerio import in crawler to package.json.
+- Get SQLI working.
+- Implemet HeadFUL mode?
+- Add intial tests.
+- Change Cheerio import in crawler to package.json.
+- Is there a way of extracting a curl request with headers and params?
+- Sort verbose mode so the output is cleaner.
+- The JSON output is also needs sorting - the url should be the primary values, not entries.
+
+**In the middle of adding params extractor for sqliInjector.

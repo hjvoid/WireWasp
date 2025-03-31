@@ -3,7 +3,7 @@ import { payloads, sqlErrorIndicators } from "../templates/basic_sqli.js"
 /**
  * Scans a webpage for SQLI
  */
-export async function scanForSQLi(url: string, verbose: boolean): Promise<[string, string, string] | null> {
+export async function sqlInjector(url: string, verbose: boolean): Promise<[string, string, string] | null> {
 
   const requests = [
     {
@@ -38,7 +38,7 @@ export async function scanForSQLi(url: string, verbose: boolean): Promise<[strin
       }
 
       const curlCommand = buildCurlCommand(request, payload);
-
+      
       const startTime = performance.now();
 
       const process = new Deno.Command(curlCommand[0], {
@@ -46,13 +46,13 @@ export async function scanForSQLi(url: string, verbose: boolean): Promise<[strin
         stdout: "piped",
         stderr: "piped",
       });
+      console.log(process.output);
 
       const { stdout, stderr } = await process.output();
-
+      
       const duration = performance.now() - startTime;
 
       const rawResponse = new TextDecoder().decode(stdout) + new TextDecoder().decode(stderr);
-      
 
       const errorMatch = sqlErrorIndicators.some((indicator) =>
         rawResponse.toLowerCase().includes(indicator.toLowerCase())
@@ -75,7 +75,6 @@ export async function scanForSQLi(url: string, verbose: boolean): Promise<[strin
 
 function buildCurlCommand(request: any, payload: string): string[] {
   const curlCommand: string[] = ["curl", "-s", "-i", "-X", request.method];
-  console.log(request);
   
   if (request.method === "POST") {
     if (request.type === "json") {
@@ -104,6 +103,7 @@ function buildCurlCommand(request: any, payload: string): string[] {
   } else {
     curlCommand.push(request.url);
   }
+  curlCommand.push("-H", `Authorization: Bearer ${Deno.env.get("AUTH_TOKEN")}`);
 
   return curlCommand;
 }

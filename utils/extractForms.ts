@@ -1,5 +1,4 @@
 import puppeteer from "npm:puppeteer@24.1.0"
-import { stdin as input, stdout as output } from "node:process";
 import { FormScanResult } from "../typings/tools/scanner.d.ts";
 import { scanForm } from "./scanForm.ts";
 

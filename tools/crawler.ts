@@ -1,11 +1,7 @@
 import * as cheerio from "npm:cheerio@1.0.0"
 import { discoverLinks } from "../utils/discoverLinks.ts";
 import { fetchHtmlWithPuppeteer } from "../utils/fetchHtmlWithPuppeteer.ts";
-
-interface ScanResult {
-    url: string;
-    formsFound?: number; 
-  }
+import { ScanResult } from "../typings/tools/scanner.d.ts";
 
 export async function crawler(
     url: string,

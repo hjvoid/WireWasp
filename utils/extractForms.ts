@@ -1,14 +1,13 @@
 import puppeteer from "npm:puppeteer@24.1.0"
+import readline from "node:readline/promises";
+import { stdin as input, stdout as output } from "node:process";
+import { FormScanResult } from "../typings/tools/scanner.d.ts";
+import { scanForm } from "./scanForm.ts";
 
-
-/**
- * Extracts form details from a dynamically rendered webpage using Puppeteer.
- * @param url - The target webpage URL.
- * @returns An array of extracted forms.
- */
-export async function extractForms(url: string, verbose: boolean) {
+export async function extractForms(url: string, verbose: boolean): Promise<FormScanResult[]> {
     const browser = await puppeteer.launch({ headless: true });
     const page = await browser.newPage();
+    let results: FormScanResult[] = [];
   
     if (verbose) {
       console.log(`%c 📡 Extracting forms and inputs at ${url}...`, "color: turquoise");
@@ -38,8 +37,19 @@ export async function extractForms(url: string, verbose: boolean) {
       return [{ action: url, method: 'POST', inputs: inputs.map((input) => input.name) }];
     }
     
-    return forms.map((form) => ({
+    results = forms.map((form) => ({
       ...form,
       inputs: inputs.map((input) => input.name),
     }));
+
+    if (results.length > 0) {
+      const runSQLI = prompt("Do you want to scan for SQL injection vulnerabilities in the forms? (y/n): ");
+      if (runSQLI?.toLowerCase() === 'y' || runSQLI?.toLowerCase() === 'yes') {
+        for (const form of results) {
+          await scanForm(url, form.action, form.method as "GET" | "POST", inputs.map((input) => input.name), verbose);
+        }
+      }
+    }
+
+    return results
   }

@@ -9,7 +9,7 @@ const args = parseArgs(Deno.args, {
     outputToFile: "o",
     verbose: "v",
     findForms: "f",
-    yamlRuleScan: "y",
+    paramSQLIScan: "p",
     help: "h"
   }
 })
@@ -29,7 +29,7 @@ async function main() {
       -o, --output  Output to file (default: false)
       -v, --verbose  Verbose output (default: false)
       -f, --findForms  Find forms on the page (default: false)
-      -y, --yes  YAML rule based scan (default: false)
+      -p  --paramSQLInjection  Scan for SQL injection vulnerabilities using URL params (default: false)
       `)
     Deno.exit(0)
   }
@@ -47,31 +47,9 @@ async function main() {
   const outputToFile = args.outputToFile ? true : false
   const verbose = args.verbose ? true : false
   const findForms = args.findForms ? true : false
-  const yamlRuleScan = args.yamlRuleScan ? true : false
+  const paramSQLIScan = args.paramSQLIScan ? true : false
   
-  const results = await scanner(startUrl, redirect, sqliInit, findForms, verbose) 
-  
-  if(results && findForms) {
-    if (verbose){
-      console.log(`\nForms Found:`)
-    }
-    results.forEach(result => {
-      if (verbose) {
-        console.log(`%c   URL: ${result.url}`, "color: yellow")
-      }
-      if(result.formsFound){
-        if (verbose) {
-          console.log(`%c     ✅ Found ${result.formsFound.toString()} form(s) on ${result.url}:`, "color: green")
-        }
-      }else {
-        if (verbose) {
-          console.log(`%c     ❌ No forms found on ${result.url}`, "color: red")
-        }
-      }
-    })
-  } else {
-    console.log(`%c No URLs found`, "color: red")
-  }
+  const results = await scanner(startUrl, redirect, sqliInit, findForms, paramSQLIScan, verbose) 
 
   if(results && outputToFile){
     Deno.writeFileSync("./results.json", new TextEncoder().encode(JSON.stringify(results, null, 2)), { append: false })

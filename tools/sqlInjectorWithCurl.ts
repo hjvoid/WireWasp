@@ -3,7 +3,7 @@ import { payloads, sqlErrorIndicators } from "../templates/basic_sqli.js"
 /**
  * Scans a webpage for SQLI
  */
-export async function sqlInjector(url: string, verbose: boolean): Promise<[string, string, string] | null> {
+export async function sqlInjectorWithCurl(url: string, verbose: boolean): Promise<[string, string, string] | null> {
 
   const requests = [
     {

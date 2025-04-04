@@ -14,6 +14,7 @@ You can then test the tool against it using the CLI command:\
 
 TODO:
 
-- Add intial tests.
-- Check ScanForm is actually working. 
+- Check ScanForm is actually working. seems to be defaulting to POST request?
 - Clean up verbose output in ScanForm 
+- Do not url encode payloads when using paramBasedSQLInjector
+- Add intial tests.

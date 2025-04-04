@@ -1,15 +1,17 @@
 import { parseArgs } from "jsr:@std/cli/parse-args"
 import { scanner } from './tools/scanner.ts'
+import getCredentials from "./utils/getCredentials.ts"
+import { removeAuthCredentials } from "./utils/removeAuthenticationFiles.ts";
 
 const args = parseArgs(Deno.args, {
   alias: {
     startUrl: "u",
     followRedirects: "r",
     sqliScan: "s",
-    outputToFile: "o",
     verbose: "v",
     findForms: "f",
     paramSQLIScan: "p",
+    outputToFile: "o",
     help: "h"
   }
 })
@@ -33,14 +35,16 @@ async function main() {
       `)
     Deno.exit(0)
   }
-  
+
   if (!startUrl || typeof startUrl !== "string" || !args) {
     console.error(
-      `%c You must provide a valid URL (example: http://example.com)`, 
+      `%c You must provide a valid URL using the -u flag (example: -u http://example.com)`, 
       "color: red"
     )
     Deno.exit(1)
   }
+
+  await getCredentials()
 
   const redirect = followRedirects ? false : true
   const sqliInit = sqliScan ? true : false
@@ -55,6 +59,8 @@ async function main() {
     Deno.writeFileSync("./results.json", new TextEncoder().encode(JSON.stringify(results, null, 2)), { append: false })
     console.log(`%c   Results saved to results.json`, "color: green");
   }
+
+  removeAuthCredentials()
 
   console.log("\n");
   console.log(`%c Done!`, "color: orange")

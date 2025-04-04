@@ -6,6 +6,11 @@ import process from "node:process";
 
 export async function paramBasedSQLInjector(url: string, verbose: boolean): Promise<void | ParamSQLInjectionResult[]> {
 	const queryParams = extractQueryParams(url);
+	
+	if (Object.keys(queryParams).length === 0) {
+		return undefined;
+	}
+	
 	const cookie = process.env.COOKIE || "myCookie";
 	const results: ParamSQLInjectionResult[] = [];
 

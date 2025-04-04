@@ -1,6 +1,6 @@
 import { ScanResult } from "../typings/tools/scanner.d.ts";
 import { sqlInjectorWithCurl } from "./sqlInjectorWithCurl.ts"
-import { extractForms } from "../utils/extractForms.ts";
+import { extractForms } from "./extractForms.ts";
 import { crawler } from "./crawler.ts";
 import { paramBasedSQLInjector } from "./paramBasedSQLInjector.ts";
 

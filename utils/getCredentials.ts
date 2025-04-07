@@ -12,7 +12,7 @@ export default async function getCredentials() {
           console.log("%c   No Pay credentials found, creating new user...", "color: orange");
           await createUser();
           const credentials = await Deno.readTextFile("./login-creds.json");
-          console.log(`%c   Using user ${JSON.parse(credentials).email}`, "background-color: green");
+          console.log(`%c   Using user ${JSON.parse(credentials).email}`, "color: orange");
           await getCookies(JSON.parse(credentials).email, JSON.parse(credentials).password, JSON.parse(credentials).otpToken);
         } else {
           throw error;

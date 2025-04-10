@@ -29,7 +29,6 @@ export async function getCookies (email: string, password: string, smsCode: stri
         console.error(error);
     }
     
-    await page.goto("http://127.0.0.1:9400/all-service-transactions/test\?pageSize\=5", { waitUntil: 'domcontentloaded' });
     await browser.close();
 
     return cookies;

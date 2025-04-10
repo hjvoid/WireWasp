@@ -25,7 +25,6 @@ export async function extractForms(url: string, verbose: boolean): Promise<FormS
           type: element.getAttribute('type') || element.tagName.toLowerCase(),
         }))
     );
-    console.log(inputs);
     
     
     const forms = await page.$$eval('form', (formElements) =>

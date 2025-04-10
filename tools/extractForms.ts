@@ -3,19 +3,19 @@ import { FormScanResult } from "../typings/tools/scanner.d.ts";
 import { scanForm } from "../utils/scanForm.ts";
 
 export async function extractForms(url: string, verbose: boolean): Promise<FormScanResult[]> {
-    const browser = await puppeteer.launch({ headless: true });
-    
+    const browser = await puppeteer.launch({headless: false, args: ['--incognito']});
     const page = await browser.newPage(); 
-    const cookieString = await Deno.readTextFile("./cookies.json");
-    const cookies = JSON.parse(cookieString);
-    await browser.setCookie(...cookies);
+    const cookieString = await Deno.readTextFile("./cookies.json")
+    const cookies = JSON.parse(cookieString)
+    await browser.setCookie(...cookies)
     
     let results: FormScanResult[] = [];
   
     if (verbose) {
       console.log(`%c 📡 Extracting forms and inputs at ${url}...`, "color: turquoise");
     }
-    await page.goto(url, { waitUntil: 'networkidle2' });
+    await page.goto(url, { waitUntil: "networkidle2" })
+    // const content = await page.content()
   
     const inputs = await page.$$eval('input, textarea, select', (elements) =>
       elements
@@ -25,6 +25,8 @@ export async function extractForms(url: string, verbose: boolean): Promise<FormS
           type: element.getAttribute('type') || element.tagName.toLowerCase(),
         }))
     );
+    console.log(inputs);
+    
     
     const forms = await page.$$eval('form', (formElements) =>
       formElements.map((form) => ({

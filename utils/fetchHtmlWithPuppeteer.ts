@@ -4,8 +4,8 @@ import puppeteer from "npm:puppeteer@24.1.0"
  * @param {string} url - The URL to fetch.
  * @returns {Promise<string>} - The HTML content.
  */
-export async function fetchHtmlWithPuppeteer(url: string): Promise<string> {
-    const browser = await puppeteer.launch({headless: false, args: ['--incognito']});
+export async function fetchHtmlWithPuppeteer(url: string, headless: boolean): Promise<string> {
+    const browser = await puppeteer.launch({headless: headless, args: ['--incognito']});
     const page = await browser.newPage()
 
     const cookieString = await Deno.readTextFile("./cookies.json")

@@ -7,6 +7,7 @@ const args = parseArgs(Deno.args, {
   alias: {
     startUrl: "u",
     followRedirects: "r",
+    headless: "e",
     sqliScan: "s",
     verbose: "v",
     findForms: "f",
@@ -23,7 +24,7 @@ const sqliScan = args.sqliScan as keyof typeof String
 async function main() {
   if(args.help){
     console.log(`
-      usage: deno run dev -u <baseUrl>
+      usage: deno run wirewasp -u <baseUrl>
       -h, --help  Show help
       -u, --url   Crawl URL e.g. http://example.com 
       -r, --redirects  Follow redirects (default: false)
@@ -52,8 +53,9 @@ async function main() {
   const verbose = args.verbose ? true : false
   const findForms = args.findForms ? true : false
   const paramSQLIScan = args.paramSQLIScan ? true : false
+  const headless = args.headless ? false : true
   
-  const results = await scanner(startUrl, redirect, sqliInit, findForms, paramSQLIScan, verbose) 
+  const results = await scanner(startUrl, redirect, sqliInit, findForms, paramSQLIScan, headless, verbose) 
 
   if(results && outputToFile){
     Deno.writeFileSync("./results.json", new TextEncoder().encode(JSON.stringify(results, null, 2)), { append: false })

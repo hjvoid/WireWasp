@@ -2,8 +2,8 @@ import puppeteer from "npm:puppeteer@24.1.0"
 import { FormScanResult } from "../typings/tools/scanner.d.ts";
 import { scanForm } from "../utils/scanForm.ts";
 
-export async function extractForms(url: string, verbose: boolean): Promise<FormScanResult[]> {
-    const browser = await puppeteer.launch({headless: false, args: ['--incognito']});
+export async function extractForms(url: string, headless: boolean, verbose: boolean): Promise<FormScanResult[]> {
+    const browser = await puppeteer.launch({headless: headless, args: ['--incognito']});
     const page = await browser.newPage(); 
     const cookieString = await Deno.readTextFile("./cookies.json")
     const cookies = JSON.parse(cookieString)

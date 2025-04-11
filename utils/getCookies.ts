@@ -12,14 +12,16 @@ export async function getCookies (email: string, password: string, smsCode: stri
     
     await Promise.all([
         page.click("#continue"),
-        page.waitForSelector("#sms_code", { visible: true, timeout: 5000 }),
+        page.waitForSelector("#sms_code", { visible: true, timeout: 3000 }),
       ]);
 
     await page.type("#sms_code", smsCode);
     await page.click("#continue");
-    await page.waitForNavigation({ waitUntil: 'networkidle2' });
+    await page.waitForNavigation({ waitUntil: 'networkidle2', timeout: 3000 });
 
     const cookies = await browser.cookies();
+    
+    await browser.close();
     
     try{
         await Deno.writeTextFile("./cookies.json", JSON.stringify(cookies, null, 2))
@@ -28,7 +30,5 @@ export async function getCookies (email: string, password: string, smsCode: stri
         console.error(error);
     }
     
-    await browser.close();
-
     return cookies;
 }

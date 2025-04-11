@@ -6,6 +6,7 @@ import { ScanResult } from "../typings/tools/scanner.d.ts";
 export async function crawler(
   url: string,
   ignoreRedirects = true,
+  headless = true,
   verbose = false,
   visited = new Set<string>()
 ): Promise<ScanResult[]> {
@@ -19,12 +20,12 @@ export async function crawler(
   const results: ScanResult[] = [{ url }];
 
   try {
-    const html = await fetchHtmlWithPuppeteer(url);
+    const html = await fetchHtmlWithPuppeteer(url, headless);
     const $ = cheerio.load(html);
     const links = discoverLinks($, url);
 
     for (const link of links) {
-      const nestedResults = await crawler(link, ignoreRedirects, verbose, visited);
+      const nestedResults = await crawler(link, ignoreRedirects, headless, verbose, visited);
       results.push(...nestedResults);
     }
   } catch (err) {

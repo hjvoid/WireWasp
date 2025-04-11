@@ -10,10 +10,11 @@ export async function scanner(
   sqliInit: boolean = false,
   findForms: boolean = false,
   paramSQLIScan: boolean = false,
+  headless: boolean = true,
   verbose: boolean = false
 ): Promise<ScanResult[]> {
 
-  const results = await crawler(startUrl, ignoreRedirects, verbose)
+  const results = await crawler(startUrl, ignoreRedirects, headless, verbose)
 
   console.log("\n");
 
@@ -40,7 +41,7 @@ export async function scanner(
   if (results && findForms) {
     await Promise.all(
       results.map(async (result) => {
-        const forms = await extractForms(result.url, verbose);
+        const forms = await extractForms(result.url, headless, verbose);
         if (forms) {
           forms.forEach((form) => {
             results[results.indexOf(result)].formScanResult = form; 

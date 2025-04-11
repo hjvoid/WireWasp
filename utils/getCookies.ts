@@ -20,7 +20,6 @@ export async function getCookies (email: string, password: string, smsCode: stri
     await page.waitForNavigation({ waitUntil: 'networkidle2' });
 
     const cookies = await browser.cookies();
-
     
     try{
         await Deno.writeTextFile("./cookies.json", JSON.stringify(cookies, null, 2))

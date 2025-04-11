@@ -5,51 +5,34 @@ import { ScanResult } from "../typings/tools/scanner.d.ts";
 
 export async function crawler(
   url: string,
-  ignoreRedirects: boolean = true,
-  verbose: boolean = false,
-  visited = new Set<string>() // make visited persistent across recursions
+  ignoreRedirects = true,
+  verbose = false,
+  visited = new Set<string>()
 ): Promise<ScanResult[]> {
-  const results: ScanResult[] = [];
-
-  if (visited.has(url)) return results;
+  if (visited.has(url)) return [];
   visited.add(url);
-  results.push({ url });
 
   if (verbose) {
-    console.log(`%c 🕸️  Crawling: ${url}`, "color: blue")
+    console.log(`%c🕸️  Crawling: ${url}`, "color: blue");
   }
+
+  const results: ScanResult[] = [{ url }];
+
   try {
-    let html: string;
-
-    html = await fetchHtmlWithPuppeteer(url);
-
-    const response = await fetch(url);
-    if (!response.ok) {
-      if (ignoreRedirects && response.status >= 300 && response.status < 400) {
-        console.warn(`Skipping redirect: ${url}`);
-        return results;
-      }
-      console.error(`Failed to fetch ${url}: ${response.status}`);
-      return results;
-    }
-
-    html = await response.text();
+    const html = await fetchHtmlWithPuppeteer(url);
     const $ = cheerio.load(html);
     const links = discoverLinks($, url);
 
     for (const link of links) {
-      const childResults = await crawler(link, ignoreRedirects, verbose, visited);
-      results.push(...childResults); // merge child results into this array
+      const nestedResults = await crawler(link, ignoreRedirects, verbose, visited);
+      results.push(...nestedResults);
     }
-
-  } catch (error) {
-    if (error instanceof Error) {
-      console.error(`%c Error crawling ${url}: ${error}`, "color: red")
-      Deno.exit(1)
-    } else {
-      console.error(`%c Unknown error crawling ${url}`, "color: red")
-      Deno.exit(1)
-    }
+  } catch (err) {
+    console.error(
+      `%cError crawling ${url}: ${err instanceof Error ? err.message : "Unknown error"}`,
+      "color: red"
+    );
+    Deno.exit(1);
   }
 
   return results;

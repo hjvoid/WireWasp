@@ -6,7 +6,7 @@ export function discoverLinks($: CheerioAPI, baseUrl: string): string[] {
 
     $("a[href]").each((_, element) => {
         const href = $(element).attr("href");
-        if (!href) return;
+        if (!href || href == "/logout" || href.includes("download")) return;
 
         // Skip anchors and JavaScript links
         if (href.startsWith("#") || href.startsWith("javascript:")) return;

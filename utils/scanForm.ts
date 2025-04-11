@@ -2,7 +2,7 @@ import { payloads, sqlErrorIndicators } from "../templates/basic_sqli.js"
 
 export async function scanForm(url: string, action: string, method: string, inputs: string[], verbose: boolean): Promise<[string, string, string] | null> {
 
-  const formURL = new URL(action, url).href // Handle relative form actions
+  const formURL = new URL(action, url).href
   const cookieString = await Deno.readTextFile("./cookies.json");
   const cookies = JSON.parse(cookieString);
 

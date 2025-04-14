@@ -3,6 +3,7 @@ import { sqlInjectorWithCurl } from "./sqlInjectorWithCurl.ts"
 import { extractForms } from "./extractForms.ts";
 import { crawler } from "./crawler.ts";
 import { paramBasedSQLInjector } from "./paramBasedSQLInjector.ts";
+import logger from "../utils/logger.ts";
 
 export async function scanner(
   startUrl: string,
@@ -24,18 +25,21 @@ export async function scanner(
 
   if (!!results && results.length > 1) {
     console.log("\n");
-    console.log(`%c   Found ${results.length} URLs: `, "color: turquoise");
+      logger(`   Found ${results.length} URLs: `, "turquoise");
     results.forEach((result, index) => {
-      console.log(`%c   [${index}] ${result.url}`, "color: turquoise");
+      logger(`   [${index}] ${result.url}`, "turquoise");
     });
     console.log("\n");
 
     const urlToTest = prompt("Please enter the index of the URL you'd like to test: ");
 
     if (urlToTest && !isNaN(Number(urlToTest))) {
-      const runSQLI = prompt(`Would you like to run param based SQL Injector on ${results[Number(urlToTest)]?.url}?: `);
+      const runSQLI = prompt(`Would you like to run param based SQL Injector on ${results[Number(urlToTest)]?.url}? (y/N): `);
       if (runSQLI?.toLowerCase() === 'y' || runSQLI?.toLowerCase() === 'yes') {
         const forms = await extractForms(results[Number(urlToTest)].url, headless, verbose);
+        
+        forms.length == 0 ? logger("\n   😞 No forms found on the page.\n", "blue") : logger(`   Found ${forms.length} forms on ${results[Number(urlToTest)].url}`, "turquoise");
+        
         if (forms) {
           forms.forEach((form) => {
             results[Number(urlToTest)].formScanResult = form;
@@ -43,7 +47,7 @@ export async function scanner(
         }
       }
     } else {
-      console.error("%c   Invalid input. Please enter a valid index.", "color: red");
+      logger("   Invalid input. Please enter a valid index.", "red");
       Deno.exit(1);
     }
   } else if (results && results.length === 1) {
@@ -53,7 +57,7 @@ export async function scanner(
     if (results && sqliInit) {
       await Promise.all(
         results.map(async (result) => {
-          console.log(`%c Invoking scanForSQLI on ${result.url}`, "color: pink");
+          logger(` Invoking scanForSQLI on ${result.url}`, "pink");
           await sqlInjectorWithCurl(result.url, verbose);
         })
       );

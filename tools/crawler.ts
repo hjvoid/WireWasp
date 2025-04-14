@@ -2,6 +2,7 @@ import * as cheerio from "npm:cheerio@1.0.0"
 import { discoverLinks } from "../utils/discoverLinks.ts";
 import { fetchHtmlWithPuppeteer } from "../utils/fetchHtmlWithPuppeteer.ts";
 import { ScanResult } from "../typings/tools/scanner.d.ts";
+import logger from "../utils/logger.ts";
 
 export async function crawler(
   url: string,
@@ -14,7 +15,7 @@ export async function crawler(
   visited.add(url);
 
   if (verbose) {
-    console.log(`%c🕸️  Crawling: ${url}`, "color: blue");
+    logger(`🕸️  Crawling: ${url}`, "blue");
   }
 
   const results: ScanResult[] = [{ url }];
@@ -29,9 +30,9 @@ export async function crawler(
       results.push(...nestedResults);
     }
   } catch (err) {
-    console.error(
-      `%cError crawling ${url}: ${err instanceof Error ? err.message : "Unknown error"}`,
-      "color: red"
+    logger(
+      `Error crawling ${url}: ${err instanceof Error ? err.message : "Unknown error"}`,
+      "red"
     );
     Deno.exit(1);
   }

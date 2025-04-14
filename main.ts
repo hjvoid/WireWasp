@@ -43,7 +43,7 @@ async function main() {
 
   if (!startUrl || typeof startUrl !== "string" || !args) {
     logger(
-      `%c You must provide a valid URL using the -u flag (example: -u http://example.com)`, 
+      "You must provide a valid URL using the -u flag (example: -u http://example.com)", 
       "red"
     )
     Deno.exit(1)
@@ -64,13 +64,13 @@ async function main() {
 
   if(results && outputToFile){
     Deno.writeFileSync("./results.json", new TextEncoder().encode(JSON.stringify(results, null, 2)), { append: false })
-    logger(`%c   Results saved to results.json`, "orange");
+    logger("Results saved to results.json", "orange");
   }
 
   removeAuthCredentials()
 
   logger("\n");
-  logger(`%c Done!`, "color: orange")
+  logger("Done!", "orange")
   logger("\n");
   
 }

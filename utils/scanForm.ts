@@ -1,13 +1,14 @@
 import { payloads, sqlErrorIndicators } from "../templates/basic_sqli.js"
 import { load } from "cheerio";
 import { fetchHtmlWithPuppeteer } from "../utils/fetchHtmlWithPuppeteer.ts";
+import logger from "./logger.ts";
 
 export async function scanForm(url: string, action: string, method: string, inputs: string[], headless: boolean, verbose: boolean): Promise<[string, string, string] | null> {
 
   const formURL = new URL(action, url).href
 
   if (verbose) {
-    console.log(`%c   🔍 Scanning form at ${formURL} (${method}) with fields: ${inputs.join(', ')}`, "color: purple")
+    logger(`   🔍 Scanning form at ${formURL} (${method}) with fields: ${inputs.join(', ')}`, "purple")
   }
 
   for (const input of inputs) {
@@ -25,7 +26,7 @@ export async function scanForm(url: string, action: string, method: string, inpu
 
       try {
         if (verbose) {
-          console.log(`%c   Testing ${fullUrl}`, "color: purple");
+          logger(`   Testing ${fullUrl}`, "purple");
         }
         const html = await fetchHtmlWithPuppeteer(fullUrl, headless);
         const $ = load(html);
@@ -34,16 +35,16 @@ export async function scanForm(url: string, action: string, method: string, inpu
         for (const indicator of sqlErrorIndicators) {
           if (text.includes(indicator)) {
             if (verbose) {
-              console.log(
-                `%c 🚨 Possible SQL injection detected! Parameter: "${input}" with payload: "${payload}"`,
-                "color: pink"
+              logger(
+                ` 🚨 Possible SQL injection detected! Parameter: "${input}" with payload: "${payload}"`,
+                "pink"
               );
             }
             return [url, input, payload];
           }
         }
       } catch (error) {
-        console.log(`%c 😭 Error testing ${fullUrl} parameter "${input}" with payload "${payload}": \n ${error}`, "color: red")
+        logger(` 😭 Error testing ${fullUrl} parameter "${input}" with payload "${payload}": \n ${error}`, "red")
       }
     }
   }

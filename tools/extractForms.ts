@@ -1,6 +1,7 @@
 import puppeteer from "npm:puppeteer@24.1.0"
 import { FormScanResult } from "../typings/tools/scanner.d.ts";
 import { scanForm } from "../utils/scanForm.ts";
+import logger from "../utils/logger.ts";
 
 export async function extractForms(url: string, headless: boolean, verbose: boolean): Promise<FormScanResult[]> {
     const browser = await puppeteer.launch({headless: headless, args: ['--incognito']});
@@ -12,7 +13,7 @@ export async function extractForms(url: string, headless: boolean, verbose: bool
     let results: FormScanResult[] = [];
   
     if (verbose) {
-      console.log(`%c 📡 Extracting forms and inputs at ${url}...`, "color: turquoise");
+      logger(` 📡 Extracting forms and inputs at ${url}...`, "turquoise");
     }
     await page.goto(url, { waitUntil: "networkidle2" })
     // const content = await page.content()
@@ -57,7 +58,7 @@ export async function extractForms(url: string, headless: boolean, verbose: bool
 
     if (results.length > 0) {
       console.log("\n");
-      console.log(`%c   Found ${results.length} form on ${url}: `, "color: turquoise")
+      logger(`   Found ${results.length} form on ${url}: `, "turquoise")
       const runSQLI = prompt("Do you want to scan for SQL injection vulnerabilities in the forms? (y/N): ")
       if (runSQLI?.toLowerCase() === 'y' || runSQLI?.toLowerCase() === 'yes') {
         for (const form of results) {

@@ -2,6 +2,7 @@ import { payloads, sqlErrorIndicators } from "../templates/basic_sqli.js"
 import { extractQueryParams } from "../utils/queryParamsExtractor.ts";
 import { ParamSQLInjectionResult } from "../typings/tools/scanner.d.ts";
 import process from "node:process";
+import logger from "../utils/logger.ts";
 
 
 export async function paramBasedSQLInjector(url: string, verbose: boolean): Promise<void | ParamSQLInjectionResult[]> {
@@ -37,7 +38,7 @@ export async function paramBasedSQLInjector(url: string, verbose: boolean): Prom
 				for (const indicator of sqlErrorIndicators) {
 					if (html.includes(indicator)) {
 						if (verbose) {
-							console.log(`%c   Found SQLI in ${testUrl.toString()} with payload: ${payload} and indicator: ${indicator}`, "color: pink");
+							logger(`   Found SQLI in ${testUrl.toString()} with payload: ${payload} and indicator: ${indicator}`, "pink");
 						}
 						results.push({
 							vulnerableUrl: testUrl.toString(),
@@ -48,7 +49,7 @@ export async function paramBasedSQLInjector(url: string, verbose: boolean): Prom
 						});
 					} else {
 						if (verbose) {
-							console.log(`%c   No SQLI in ${testUrl.toString()} with payload: ${payload} and indicator: ${indicator}`, "color: purple");
+							logger(`   No SQLI in ${testUrl.toString()} with payload: ${payload} and indicator: ${indicator}`, "purple");
 						}
 						results.push({
 							vulnerableUrl: testUrl.toString(),
@@ -59,7 +60,7 @@ export async function paramBasedSQLInjector(url: string, verbose: boolean): Prom
 					}
 				}
 			} catch (e) {
-				console.log(e);
+				console.error(e);
 			}
 		}
 	}

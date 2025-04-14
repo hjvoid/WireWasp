@@ -1,4 +1,5 @@
 import { payloads, sqlErrorIndicators } from "../templates/basic_sqli.js"
+import logger from "../utils/logger.ts";
 
 /**
  * Scans a webpage for SQLI
@@ -34,7 +35,7 @@ export async function sqlInjectorWithCurl(url: string, verbose: boolean): Promis
   for (const request of requests) {
     payloads.forEach(async (payload: string) => {
       if (verbose) {
-        console.log(`%c   Testing ${url} ${request.method} for SQLI request with payload: ${payload}`, "color: purple")
+        logger(`   Testing ${url} ${request.method} for SQLI request with payload: ${payload}`, "purple")
       }
 
       const curlCommand = buildCurlCommand(request, payload);
@@ -66,7 +67,6 @@ export async function sqlInjectorWithCurl(url: string, verbose: boolean): Promis
         : isTimeBasedPayload && slowResponse
         ? "⏱️ Possible Time-Based SQLi"
         : "✅ No injection detected";
-      // console.log(`%c     🔎 Result: ${vulnerabilityStatus}`, "color: tangerine");
     })
   }
 

@@ -1,4 +1,5 @@
 import puppeteer from "npm:puppeteer@24.1.0"
+import logger from "./logger.ts";
 
 export async function getCookies (email: string, password: string, smsCode: string) {
 
@@ -26,7 +27,7 @@ export async function getCookies (email: string, password: string, smsCode: stri
     try{
         await Deno.writeTextFile("./cookies.json", JSON.stringify(cookies, null, 2))
     } catch (error) {
-        console.error("%c   Error saving cookies to file", "color: red");
+        logger("   Error saving cookies to file", "red");
         console.error(error);
     }
     

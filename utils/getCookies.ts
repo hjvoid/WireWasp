@@ -17,12 +17,12 @@ export async function getCookies (email: string, password: string, smsCode: stri
 
     await page.type("#sms_code", smsCode);
     await page.click("#continue");
-    await page.waitForNavigation({ waitUntil: 'networkidle2', timeout: 3000 });
+    await page.waitForNavigation({ waitUntil: 'networkidle2', timeout: 5000 });
 
     const cookies = await browser.cookies();
     
     await browser.close();
-    
+
     try{
         await Deno.writeTextFile("./cookies.json", JSON.stringify(cookies, null, 2))
     } catch (error) {

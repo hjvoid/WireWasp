@@ -14,7 +14,7 @@ You can then test the tool against it using the CLI command:\
 
 TODO:
 
-- Check ScanForm is actually working. seems to be defaulting to POST request?
-- Clean up verbose output in ScanForm 
-- Do not url encode payloads when using paramBasedSQLInjector
+- Setup to run crawl and then choose url for sqli/XSS/etc
+- Look into proxy settings in Puppeteer to escape url encoding
 - Add intial tests.
+- Convert logging to use logger util.

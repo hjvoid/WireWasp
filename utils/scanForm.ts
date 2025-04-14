@@ -1,13 +1,13 @@
 import { payloads, sqlErrorIndicators } from "../templates/basic_sqli.js"
+import { load } from "cheerio";
+import { fetchHtmlWithPuppeteer } from "../utils/fetchHtmlWithPuppeteer.ts";
 
-export async function scanForm(url: string, action: string, method: string, inputs: string[], verbose: boolean): Promise<[string, string, string] | null> {
+export async function scanForm(url: string, action: string, method: string, inputs: string[], headless: boolean, verbose: boolean): Promise<[string, string, string] | null> {
 
   const formURL = new URL(action, url).href
-  const cookieString = await Deno.readTextFile("./cookies.json");
-  const cookies = JSON.parse(cookieString);
 
   if (verbose) {
-    console.log(`%c 🔍 Scanning form at ${formURL} (${method}) with fields: ${inputs.join(', ')}`, "color: yellow")
+    console.log(`%c   🔍 Scanning form at ${formURL} (${method}) with fields: ${inputs.join(', ')}`, "color: purple")
   }
 
   for (const input of inputs) {
@@ -16,48 +16,31 @@ export async function scanForm(url: string, action: string, method: string, inpu
       params[input] = payload;
 
       let fullUrl = formURL;
-      const fetchOptions: RequestInit = {
-        credentials: "include",
-        headers: {
-              Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-              ...(method === "POST" ? { "Content-Type": "application/json" } : {}),
-              Cookie: cookies.map((cookie: { name: string; value: string }) => `${cookie.name}=${cookie.value}`).join("; "),
-          },
-          method,
-          mode: "cors"
-        }
-      
 
-      if (method === 'GET') {
-        const queryString = Object.entries(params)
-          .map(([key, value]) => `${key}=${value}`)
-          .join("&");
-        fullUrl = `${formURL}?${queryString}`;
-        
-      } else if (method === 'POST') {
-        fetchOptions.body = JSON.stringify(params);
-      }
+      const queryString = Object.entries(params)
+        .map(([key, value]) => `${key}=${value}`)
+        .join("&");
+
+      fullUrl = `${formURL}?${queryString}`;
 
       try {
         if (verbose) {
           console.log(`%c   Testing ${fullUrl}`, "color: purple");
         }
-        
-        const response = await fetch(fullUrl, fetchOptions);    
-        const bodyText = await response.text();
+        const html = await fetchHtmlWithPuppeteer(fullUrl, headless);
+        const $ = load(html);
+        const text = $('body').text();
 
-        const foundSqlError = sqlErrorIndicators.some(indicator =>
-          bodyText.toLowerCase().includes(indicator.toLowerCase())
-        );
-
-        if (foundSqlError) {
-          if (verbose) {
-            console.log(
-              `%c 🚨 Possible SQL injection detected! Parameter: "${input}" with payload: "${payload}"`,
-              "color: pink"
-            );
+        for (const indicator of sqlErrorIndicators) {
+          if (text.includes(indicator)) {
+            if (verbose) {
+              console.log(
+                `%c 🚨 Possible SQL injection detected! Parameter: "${input}" with payload: "${payload}"`,
+                "color: pink"
+              );
+            }
+            return [url, input, payload];
           }
-          return [url, input, payload];
         }
       } catch (error) {
         console.log(`%c 😭 Error testing ${fullUrl} parameter "${input}" with payload "${payload}": \n ${error}`, "color: red")

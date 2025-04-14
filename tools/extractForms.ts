@@ -8,7 +8,7 @@ export async function extractForms(url: string, headless: boolean, verbose: bool
     const cookieString = await Deno.readTextFile("./cookies.json")
     const cookies = JSON.parse(cookieString)
     await browser.setCookie(...cookies)
-    
+
     let results: FormScanResult[] = [];
   
     if (verbose) {
@@ -24,26 +24,35 @@ export async function extractForms(url: string, headless: boolean, verbose: bool
           name: element.getAttribute('name'),
           type: element.getAttribute('type') || element.tagName.toLowerCase(),
         }))
-    );
+    );   
     
+    const reducedInputs = inputs.reduce((acc: { name: string; type: string }[], input) => {
+      const exists = acc.find(item => item.name === input.name);
+      if (!exists) {
+        acc.push(input);
+      }
+      return acc;
+    }, []);
     
-    const forms = await page.$$eval('form', (formElements) =>
-      formElements.map((form) => ({
-        action: form.getAttribute('action') || '',
-        method: (form.getAttribute('method') || 'GET').toUpperCase(),
-      }))
-    );
-    
+    const forms = await page.$$eval('form', (formElements) => {
+      return formElements
+        .map((form) => ({
+          action: form.getAttribute('action') || '',
+          method: (form.getAttribute('method') || 'GET').toUpperCase(),
+        }))
+        .filter((form) => form.action.trim() !== '');
+    });
+
     await browser.close();
   
     // Make sure elements not enclosed within a <form> element are not ignored.
-    if (forms.length === 0 && inputs.length > 0) {
+    if (forms.length === 0 && reducedInputs.length > 0) {
       return [{ action: url, method: 'POST', inputs: inputs.map((input) => input.name) }];
     }
     
     results = forms.map((form) => ({
       ...form,
-      inputs: inputs.map((input) => input.name),
+      inputs: reducedInputs.map((input) => input.name),
     }));
 
     if (results.length > 0) {
@@ -52,7 +61,7 @@ export async function extractForms(url: string, headless: boolean, verbose: bool
       const runSQLI = prompt("Do you want to scan for SQL injection vulnerabilities in the forms? (y/N): ")
       if (runSQLI?.toLowerCase() === 'y' || runSQLI?.toLowerCase() === 'yes') {
         for (const form of results) {
-          await scanForm(url, form.action, form.method, inputs.map((input) => input.name), verbose)
+          await scanForm(url, form.action, form.method, reducedInputs.map((input) => input.name), headless, verbose)
         }
       }
     }

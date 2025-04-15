@@ -3,6 +3,7 @@ import { scanner } from './tools/scanner.ts'
 import getCredentials from "./utils/getCredentials.ts"
 import { removeAuthCredentials } from "./utils/removeAuthenticationFiles.ts";
 import logger from "./utils/logger.ts";
+import getHelp from "./utils/getHelp.ts";
 
 const args = parseArgs(Deno.args, {
   alias: {
@@ -25,27 +26,16 @@ const sqliScan = args.sqliScan as keyof typeof String
 
 async function main() {
   if(args.help){
-    logger(`
-      usage: deno run wirewasp -u <baseUrl>
-      -h, --help  Show help
-      -u, --url   Crawl URL e.g. http://example.com 
-      -r, --redirects  Follow redirects (default: false)
-      -e, --headless  Turn off headless mode (default: on)
-      -c, --crawl Crawl the URL (default: false)
-      -s, --sqli  Scan for SQL injection vulnerabilities (default: false)
-      -o, --output  Output to file (default: false)
-      -v, --verbose  Verbose output (default: false)
-      -f, --findForms  Find forms on the page (default: false)
-      -p  --paramSQLInjection  Scan for SQL injection vulnerabilities using URL params (default: false)
-      `, "orange")
+    getHelp()
     Deno.exit(0)
   }
 
   if (!startUrl || typeof startUrl !== "string" || !args) {
     logger(
-      "You must provide a valid URL using the -u flag (example: -u http://example.com)", 
+      "You must provide a valid URL using the -u flag (example: -u http://example.com)\nFor more information, use the -h flag", 
       "red"
     )
+    getHelp()
     Deno.exit(1)
   }
 

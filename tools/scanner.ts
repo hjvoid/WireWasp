@@ -37,14 +37,12 @@ export async function scanner(
       const runSQLI = prompt(`Would you like to run param based SQL Injector on ${results[Number(urlToTest)]?.url}? (y/N): `);
       if (runSQLI?.toLowerCase() === 'y' || runSQLI?.toLowerCase() === 'yes') {
         const forms = await extractForms(results[Number(urlToTest)].url, headless, verbose);
-        
-        forms.length == 0 ? logger("\n   😞 No forms found on the page.\n", "blue") : logger(`   Found ${forms.length} forms on ${results[Number(urlToTest)].url}`, "turquoise");
-        
+
         if (forms) {
           forms.forEach((form) => {
             results[Number(urlToTest)].formScanResult = form;
           })
-        }
+        } 
       }
     } else {
       logger("   Invalid input. Please enter a valid index.", "red");
@@ -54,7 +52,7 @@ export async function scanner(
 
     console.log("\n");
 
-    if (results && sqliInit) {
+    if (!!results && results.length < 2 && sqliInit) {
       await Promise.all(
         results.map(async (result) => {
           logger(` Invoking scanForSQLI on ${result.url}`, "pink");
@@ -63,7 +61,7 @@ export async function scanner(
       );
     }
 
-    if (results && paramSQLIScan) {
+    if (!!results && results.length < 2 && paramSQLIScan) {
       await Promise.all(
         results.map(async (result) => {
           const paramSQLInjectionResult = await paramBasedSQLInjector(result.url, verbose);
@@ -74,7 +72,7 @@ export async function scanner(
       )
     }
    
-    if (results && findForms) {
+    if (!!results && results.length < 2 && findForms) {
       await Promise.all(
         results.map(async (result) => {       
           const forms = await extractForms(result.url, headless, verbose);

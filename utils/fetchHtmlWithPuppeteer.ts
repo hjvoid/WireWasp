@@ -1,9 +1,5 @@
 import puppeteer from "npm:puppeteer@24.1.0"
-/**
- * Fetch HTML using Puppeteer for JavaScript-rendered pages.
- * @param {string} url - The URL to fetch.
- * @returns {Promise<string>} - The HTML content.
- */
+
 export async function fetchHtmlWithPuppeteer(url: string, headless: boolean): Promise<string> {
     const browser = await puppeteer.launch({headless: headless, args: ['--incognito']});
     const page = await browser.newPage()

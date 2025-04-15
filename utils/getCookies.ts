@@ -17,8 +17,11 @@ export async function getCookies (email: string, password: string, smsCode: stri
       ]);
 
     await page.type("#sms_code", smsCode);
-    await page.click("#continue");
-    await page.waitForNavigation({ waitUntil: 'networkidle2', timeout: 5000 });
+    
+    await Promise.all([
+        page.click("#continue"),
+        page.waitForNavigation({ waitUntil: 'load', timeout: 5000 }),    
+    ]);
 
     const cookies = await browser.cookies();
     

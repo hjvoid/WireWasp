@@ -13,7 +13,7 @@ export async function extractForms(url: string, headless: boolean, verbose: bool
     let results: FormScanResult[] = [];
   
     if (verbose) {
-      logger(` 📡 Extracting forms and inputs at ${url}...`, "turquoise");
+      logger(` 📡 Extracting forms and inputs at ${url}`, "blue");
     }
     await page.goto(url, { waitUntil: "networkidle2" })
     // const content = await page.content()
@@ -34,7 +34,7 @@ export async function extractForms(url: string, headless: boolean, verbose: bool
       }
       return acc;
     }, []);
-    
+
     const forms = await page.$$eval('form', (formElements) => {
       return formElements
         .map((form) => ({
@@ -47,7 +47,8 @@ export async function extractForms(url: string, headless: boolean, verbose: bool
     await browser.close();
   
     // Make sure elements not enclosed within a <form> element are not ignored.
-    if (forms.length === 0 && reducedInputs.length > 0) {
+    if (forms.length === 0 && reducedInputs.length > 0) { 
+      logger(`    ⛔ No forms found and on ${url}`, "orange");     
       return [{ action: url, method: 'POST', inputs: inputs.map((input) => input.name) }];
     }
     
@@ -58,7 +59,7 @@ export async function extractForms(url: string, headless: boolean, verbose: bool
 
     if (results.length > 0) {
       console.log("\n");
-      logger(`   Found ${results.length} form on ${url}: `, "turquoise")
+      logger(`   Found ${results.length} form on ${url}: `, "blue")
       const runSQLI = prompt("Do you want to scan for SQL injection vulnerabilities in the forms? (y/N): ")
       if (runSQLI?.toLowerCase() === 'y' || runSQLI?.toLowerCase() === 'yes') {
         for (const form of results) {

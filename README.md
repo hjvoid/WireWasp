@@ -17,4 +17,3 @@ TODO:
 - Setup to run crawl and then choose url for sqli/XSS/etc
 - Look into proxy settings in Puppeteer to escape url encoding
 - Add intial tests.
-- Convert logging to use logger util.

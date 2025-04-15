@@ -48,5 +48,6 @@ export async function scanForm(url: string, action: string, method: string, inpu
       }
     }
   }
+  logger(`    ⛔ No forms found and on ${url}`, "orange"); 
   return null
 }

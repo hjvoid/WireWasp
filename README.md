@@ -12,8 +12,11 @@ This should run the container if you have it, or pull+run if you don't.
 You can then test the tool against it using the CLI command:\
 `deno run wirewasp -u http://localhost:3000`
 
-TODO:
+## ⚠️ Disclaimer
 
-- Setup to run crawl and then choose url for sqli/XSS/etc
-- Look into proxy settings in Puppeteer to escape url encoding
-- Add intial tests.
+This tool is intended **solely for educational and authorized penetration testing purposes**.  
+Unauthorized use of this software against systems you do not own or have explicit permission to test is **strictly prohibited** and may be a violation of local, state, federal, and international laws.  
+
+The author(s) of this project will **not be held liable** for any misuse or damages caused by this tool.  
+
+By using this software, you agree to take full responsibility for your actions and to use it **only in a lawful manner**.

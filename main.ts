@@ -4,6 +4,7 @@ import getCredentials from "./utils/getCredentials.ts"
 import { removeAuthCredentials } from "./utils/removeAuthenticationFiles.ts";
 import logger from "./utils/logger.ts";
 import getHelp from "./utils/getHelp.ts";
+import banner from "./utils/banner.ts";
 
 const args = parseArgs(Deno.args, {
   alias: {
@@ -26,6 +27,7 @@ const sqliScan = args.sqliScan as keyof typeof String
 
 async function main() {
   if(args.help){
+    banner()
     getHelp()
     Deno.exit(0)
   }

@@ -4,7 +4,7 @@ export async function createUser() {
 
     const cmd = new Deno.Command("sh", {
         args: ["-c", "pay local user"],
-    });
+    })
     const { stdout } = await cmd.output()
     const output = new TextDecoder().decode(stdout)
 
@@ -14,13 +14,13 @@ export async function createUser() {
 
         for (const line of lines) {
             if (line.startsWith("📧")) {
-                credentials.email = line.split("Email:")[1]?.trim();
+                credentials.email = line.split("Email:")[1]?.trim()
             } else if (line.startsWith("🛂")) {
-                credentials.password = line.split("Password:")[1]?.trim();
+                credentials.password = line.split("Password:")[1]?.trim()
             } else if (line.startsWith("🔑")) {
-                credentials.otpKey = line.split("OTP key:")[1]?.trim();
+                credentials.otpKey = line.split("OTP key:")[1]?.trim()
             } else if (line.startsWith("📱")) {
-                credentials.otpToken = line.split("OTP token:")[1]?.trim();
+                credentials.otpToken = line.split("OTP token:")[1]?.trim()
             }
         }
 

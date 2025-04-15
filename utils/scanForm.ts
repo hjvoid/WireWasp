@@ -1,7 +1,7 @@
 import { payloads, sqlErrorIndicators } from "../templates/basic_sqli.js"
-import { load } from "cheerio";
-import { fetchHtmlWithPuppeteer } from "../utils/fetchHtmlWithPuppeteer.ts";
-import logger from "./logger.ts";
+import { load } from "cheerio"
+import { fetchHtmlWithPuppeteer } from "../utils/fetchHtmlWithPuppeteer.ts"
+import logger from "./logger.ts"
 
 export async function scanForm(url: string, action: string, method: string, inputs: string[], headless: boolean, verbose: boolean): Promise<[string, string, string] | null> {
 
@@ -13,24 +13,24 @@ export async function scanForm(url: string, action: string, method: string, inpu
 
   for (const input of inputs) {
     for await (const payload of payloads) {
-      const params: Record<string, string> = {};
-      params[input] = payload;
+      const params: Record<string, string> = {}
+      params[input] = payload
 
-      let fullUrl = formURL;
+      let fullUrl = formURL
 
       const queryString = Object.entries(params)
         .map(([key, value]) => `${key}=${value}`)
-        .join("&");
+        .join("&")
 
-      fullUrl = `${formURL}?${queryString}`;
+      fullUrl = `${formURL}?${queryString}`
 
       try {
         if (verbose) {
-          logger(`   Testing ${fullUrl}`, "purple");
+          logger(`   Testing ${fullUrl}`, "purple")
         }
-        const html = await fetchHtmlWithPuppeteer(fullUrl, headless);
-        const $ = load(html);
-        const text = $('body').text();
+        const html = await fetchHtmlWithPuppeteer(fullUrl, headless)
+        const $ = load(html)
+        const text = $('body').text()
 
         for (const indicator of sqlErrorIndicators) {
           if (text.includes(indicator)) {
@@ -38,9 +38,9 @@ export async function scanForm(url: string, action: string, method: string, inpu
               logger(
                 ` 🚨 Possible SQL injection detected! Parameter: "${input}" with payload: "${payload}"`,
                 "pink"
-              );
+              )
             }
-            return [url, input, payload];
+            return [url, input, payload]
           }
         }
       } catch (error) {
@@ -48,6 +48,6 @@ export async function scanForm(url: string, action: string, method: string, inpu
       }
     }
   }
-  logger(`    ⛔ No forms found and on ${url}`, "orange"); 
+  logger(`    ⛔ No forms found and on ${url}`, "orange") 
   return null
 }

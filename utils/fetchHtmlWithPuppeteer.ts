@@ -1,7 +1,7 @@
 import puppeteer from "npm:puppeteer@24.1.0"
 
 export async function fetchHtmlWithPuppeteer(url: string, headless: boolean): Promise<string> {
-    const browser = await puppeteer.launch({headless: headless, args: ['--incognito']});
+    const browser = await puppeteer.launch({headless: headless, args: ['--incognito']})
     const page = await browser.newPage()
 
     const cookieString = await Deno.readTextFile("./cookies.json")

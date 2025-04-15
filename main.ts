@@ -1,10 +1,10 @@
 import { parseArgs } from "jsr:@std/cli/parse-args"
 import { scanner } from './tools/scanner.ts'
 import getCredentials from "./utils/getCredentials.ts"
-import { removeAuthCredentials } from "./utils/removeAuthenticationFiles.ts";
-import logger from "./utils/logger.ts";
-import getHelp from "./utils/getHelp.ts";
-import banner from "./utils/banner.ts";
+import { removeAuthCredentials } from "./utils/removeAuthenticationFiles.ts"
+import logger from "./utils/logger.ts"
+import getHelp from "./utils/getHelp.ts"
+import banner from "./utils/banner.ts"
 
 const args = parseArgs(Deno.args, {
   alias: {
@@ -52,18 +52,27 @@ async function main() {
   const headless = args.headless ? false : true
   const crawl = args.crawl ? true : false
   
-  const results = await scanner(startUrl, redirect, sqliInit, findForms, paramSQLIScan, crawl, headless, verbose) 
+  const results = await scanner(
+    startUrl, 
+    redirect, 
+    sqliInit, 
+    findForms, 
+    paramSQLIScan, 
+    crawl, 
+    headless, 
+    verbose
+  ) 
 
   if(results && outputToFile){
     Deno.writeFileSync("./results.json", new TextEncoder().encode(JSON.stringify(results, null, 2)), { append: false })
-    logger("Results saved to results.json", "orange");
+    logger("Results saved to results.json", "orange")
   }
 
   removeAuthCredentials()
 
-  logger("\n");
+  logger("\n")
   logger("Done!", "orange")
-  logger("\n");
+  logger("\n")
   
 }
 

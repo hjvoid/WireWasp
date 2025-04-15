@@ -1,17 +1,17 @@
 export async function removeAuthCredentials () {
     try {
-      await Deno.remove("./login-creds.json");
+      await Deno.remove("./login-creds.json")
     } catch (err) {
       if (!(err instanceof Deno.errors.NotFound)) {
-        throw err;
+        throw err
       }
     }
   
     try {
-      await Deno.remove("./cookies.json");
+      await Deno.remove("./cookies.json")
     } catch (err) {
       if (!(err instanceof Deno.errors.NotFound)) {
-        throw err;
+        throw err
       }
     }
   }

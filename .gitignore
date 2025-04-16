@@ -4,3 +4,4 @@ node_modules
 .DS_Store
 cookies.json
 login-creds.json
+results.json

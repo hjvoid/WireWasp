@@ -9,6 +9,8 @@ export async function scanForm(url: string, action: string, method: string, inpu
 
   if (verbose) {
     logger(`   🔍 Scanning form at ${formURL} (${method}) with fields: ${inputs.join(', ')}`, "purple")
+    console.log("\n")
+    
   }
 
   for (const input of inputs) {
